@@ -13,7 +13,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
     // 分页
     const page = searchParams.get("page") || 1
     const pageSize = searchParams.get("pageSize") || 20
-    console.log(page, pageSize)
     const [data, totalCount] = await Promise.all([
       prisma.user.findMany({
         skip: (Number(page) - 1) * Number(pageSize),
@@ -37,7 +36,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
 // post 新增
 export async function POST(request: NextRequest, response: NextResponse) {
   const body = await request.json()
-  console.log("post add body", body)
   try {
     const data = await prisma.user.create({
       data: {
