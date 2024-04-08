@@ -13,24 +13,114 @@ pnpm dev
 # or
 bun dev
 ```
+## .env
+.env文件不在，需要手动添加你的mysql数据库
+```
+DATABASE_URL="mysql://xx:xxx@xxxx:3306/xxx"
+```
+初始化数据库
+```
+npx prisma generate
+```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## prisma
+在Next.js中使用Prisma的步骤大致如下：
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### 1. 安装Prisma CLI
 
-## Learn More
+首先，你需要在你的Next.js项目中安装Prisma CLI。你可以通过npm或yarn来安装。
 
-To learn more about Next.js, take a look at the following resources:
+```bash
+npm install prisma --save-dev
+# 或者
+yarn add prisma --dev
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. 初始化Prisma
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+接着，初始化Prisma以生成Prisma配置文件。
 
-## Deploy on Vercel
+```bash
+npx prisma init
+```
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+这将创建一个`prisma`文件夹，里面含有一个`schema.prisma`文件，用于定义你的数据模型，以及一个`.env`文件，用于存放数据库连接信息。
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### 3. 配置数据库连接
+
+在`.env`文件中配置你的数据库连接字符串。例如，如果你使用的是PostgreSQL，你的配置可能看起来像这样：
+
+```
+DATABASE_URL="postgresql://USER:PASSWORD@HOST:PORT/DATABASE?schema=public"
+```
+
+请确保将`USER`, `PASSWORD`, `HOST`, `PORT`, 和 `DATABASE`替换成你自己的数据库信息。
+
+### 4. 定义数据模型
+
+在`schema.prisma`文件中定义你的数据模型。例如，如果你想创建一个`User`表，你可以这样定义：
+
+```prisma
+model User {
+  id        Int      @id @default(autoincrement())
+  name      String
+  email     String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+```
+
+### 5. 生成Prisma客户端
+
+运行下面的命令来生成Prisma客户端。这将根据你的数据模型生成一个Prisma客户端，你可以在你的Next.js应用中使用它来进行数据库操作。
+
+```bash
+npx prisma generate
+```
+
+### 6. 使用Prisma客户端
+
+现在你可以在你的Next.js应用中使用Prisma客户端了。首先，你需要导入Prisma客户端：
+
+```javascript
+import { PrismaClient } from '@prisma/client'
+```
+
+然后，实例化Prisma客户端：
+
+```javascript
+const prisma = new PrismaClient()
+```
+
+最后，你就可以使用Prisma客户端来进行数据库操作了。例如，创建一个新用户：
+
+```javascript
+async function createUser(name, email) {
+  const user = await prisma.user.create({
+    data: {
+      name,
+      email,
+    },
+  })
+  return user
+}
+```
+
+这些步骤提供了在Next.js项目中使用Prisma的基本指南。根据你的具体需求，你可能还需要查阅Prisma的官方文档来了解更多高级特性和最佳实践。
+
+#### 模型和数据库同步
+1. 本地模型同步远程数据库
+```
+npx prisma migrate dev
+```
+2. 远程数据库同步本地模型
+```
+npm prisma db pull
+```
+Prisma 会自动在 prisma/schema.prisma 中同步字段
+
+以上1，2，都需要
+```
+npx prisma generate
+```
