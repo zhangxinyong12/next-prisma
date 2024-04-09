@@ -241,7 +241,7 @@ const Page = () => {
     const params = {
       page: tableParams?.pagination?.current,
       pageSize: tableParams?.pagination?.pageSize,
-      params: JSON.stringify(tableParams?.params??{}),
+      params: JSON.stringify(tableParams?.params ?? {}),
     }
     fetch("/api/user?" + new URLSearchParams(params as any).toString(), {
       method: "GET",
@@ -331,7 +331,7 @@ const Page = () => {
               </Col>
               <Col span={6}>
                 <Form.Item label="邮箱" name="email">
-                  <Input placeholder="请输入邮箱"  allowClear />
+                  <Input placeholder="请输入邮箱" allowClear />
                 </Form.Item>
               </Col>
               <Col span={6}>
