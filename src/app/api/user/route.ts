@@ -3,6 +3,9 @@ import { NextRequest, NextResponse } from "next/server"
 import prisma from "@/lib/prisma"
 import { buildJsonResponse } from "@/utils"
 
+// 缓存10秒
+export const revalidate = 10
+
 export async function GET(request: NextRequest, response: NextResponse) {
   try {
     // 获取url参数
@@ -10,7 +13,7 @@ export async function GET(request: NextRequest, response: NextResponse) {
     const pathname = request.nextUrl.pathname
     // 访问 /home?name=lee, searchParams 的值为 { 'name': 'lee' }
     const searchParams = request.nextUrl.searchParams
-    let params: any = searchParams.get("params")
+    let params: any = searchParams.get("params") ?? "{}"
     params = params ? JSON.parse(params === "undefined" ? "{}" : params) : {}
     const where = {
       name: {
