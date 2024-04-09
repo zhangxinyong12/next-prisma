@@ -23,12 +23,9 @@ export async function GET(request: NextRequest, response: NextResponse) {
         contains: params?.email || undefined,
       },
     }
-
     // 分页
     const page = searchParams.get("page") || 1
     const pageSize = searchParams.get("pageSize") || 20
-    console.log(page, pageSize, params, where)
-
     const [data, totalCount] = await Promise.all([
       prisma.user.findMany({
         skip: (Number(page) - 1) * Number(pageSize),
@@ -53,8 +50,6 @@ export async function GET(request: NextRequest, response: NextResponse) {
       })
     )
   } catch (error) {
-    console.log(error)
-
     return NextResponse.json(buildJsonResponse([], false, error as any))
   }
 }
@@ -68,7 +63,6 @@ export async function POST(request: NextRequest, response: NextResponse) {
         ...body,
       },
     })
-
     return NextResponse.json(buildJsonResponse(data))
   } catch (error: any) {
     return NextResponse.json(buildJsonResponse([], false, error))
@@ -83,7 +77,6 @@ export async function DELETE(request: NextRequest, response: NextResponse) {
         id: Number(id),
       },
     })
-
     return NextResponse.json(buildJsonResponse(data))
   } catch (e) {
     return NextResponse.json(buildJsonResponse([], false, e as any))
@@ -93,7 +86,6 @@ export async function DELETE(request: NextRequest, response: NextResponse) {
 export async function PUT(request: NextRequest, response: NextResponse) {
   const body = await request.json()
   const id = body?.id
-  console.log("put body", body)
   if (!id) {
     return NextResponse.json(buildJsonResponse([], false, "id is required"))
   }
