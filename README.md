@@ -25,6 +25,9 @@ npx prisma generate
 
 
 ## prisma
+<span style="color:red;">npx prisma migrate dev 会删除数据库，所以请谨慎使用。</span>
+
+
 在Next.js中使用Prisma的步骤大致如下：
 
 ### 1. 安装Prisma CLI
@@ -118,6 +121,7 @@ async function createUser(name, email) {
 ```
 npx prisma migrate dev
 ```
+先删除再创建。慎用
 2. 远程数据库同步本地模型
 ```
 npm prisma db pull

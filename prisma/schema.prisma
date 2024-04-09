@@ -7,6 +7,7 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+// 用户
 model User {
   id        Int      @id @default(autoincrement())
   name      String
@@ -14,4 +15,16 @@ model User {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
   desc      String?  @db.VarChar(255)
+  notes     Note[]
+}
+
+// 笔记
+model Note {
+  id        Int      @id @default(autoincrement())
+  title     String   @db.VarChar(200)
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  author    User     @relation(fields: [authorId], references: [id])
+  authorId  Int
 }

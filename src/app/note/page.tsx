@@ -20,83 +20,8 @@ import {
   PlusOutlined,
 } from "@ant-design/icons"
 import dayjs from "dayjs"
+import NoteModal from "./noteModal"
 const { TextArea } = Input
-
-type UserModalProps = {
-  open: boolean
-  data?: any
-  onClose: () => void
-  onOk: (data: any) => void
-}
-
-const UserModal: React.FC<UserModalProps> = ({ open, data, onClose, onOk }) => {
-  const [form] = Form.useForm()
-  function onSubmit() {
-    form.validateFields().then((values) => {
-      onOk(values)
-    })
-  }
-
-  useEffect(() => {
-    if (open && data?.id) {
-      form.setFieldsValue(data)
-    } else {
-      form.resetFields()
-    }
-  }, [open, data])
-
-  return (
-    <Modal
-      open={open}
-      title={data?.id ? "编辑用户" : "新增用户"}
-      onOk={onSubmit}
-      onCancel={() => {
-        onClose()
-      }}
-      okText="确定"
-      cancelText="取消"
-    >
-      <Form form={form} labelCol={{ span: 4 }}>
-        <Form.Item
-          name="name"
-          label="用户名"
-          rules={[
-            {
-              required: true,
-              message: "请输入用户名",
-            },
-          ]}
-        >
-          <Input placeholder="请输入用户名" />
-        </Form.Item>
-        <Form.Item
-          name="email"
-          label="邮箱"
-          rules={[
-            {
-              required: true,
-              message: "请输入邮箱",
-            },
-          ]}
-        >
-          <Input placeholder="请输入邮箱" type="email" />
-        </Form.Item>
-        <Form.Item
-          name="desc"
-          label="备注"
-          rules={[
-            {
-              required: true,
-              message: "请输入备注",
-            },
-          ]}
-        >
-          <TextArea placeholder="请输入备注" />
-        </Form.Item>
-      </Form>
-    </Modal>
-  )
-}
 
 type ColumnsType<T> = TableProps<T>["columns"]
 type TablePaginationConfig = Exclude<GetProp<TableProps, "pagination">, boolean>
@@ -118,16 +43,16 @@ const Page = () => {
       dataIndex: "id",
     },
     {
-      title: "用户名",
-      dataIndex: "name",
+      title: "笔记名",
+      dataIndex: "title",
     },
     {
-      title: "邮箱",
-      dataIndex: "email",
+      title: "内容",
+      dataIndex: "content",
     },
     {
-      title: "笔记数量",
-      dataIndex: ["_count", "notes"],
+      title: "作者",
+      dataIndex: ["author", "name"],
     },
     {
       title: "创建时间",
@@ -142,10 +67,6 @@ const Page = () => {
       render: (text: string) => {
         return dayjs(text).format("YYYY-MM-DD HH:mm:ss")
       },
-    },
-    {
-      title: "备注",
-      dataIndex: "desc",
     },
     {
       title: "操作",
@@ -177,19 +98,19 @@ const Page = () => {
   const [openModal, setOpenModal] = useState<boolean>(false)
   const [modalData, setModalData] = useState<any>()
 
-  function handleDelete(id: number, name: string) {
+  function handleDelete(id: number, title: string) {
     // 删除二次确认
     confirm({
       title: (
         <div>
           <span>
             确定删除
-            <span className="text-red-600 font-bold">{name}</span>吗
+            <span className="text-red-600 font-bold">{title}</span>吗
           </span>
         </div>
       ),
       onOk() {
-        fetch(`/api/user?id=${id}`, {
+        fetch(`/api/note?id=${id}`, {
           method: "DELETE",
         }).then(() => {
           message.success("删除成功")
@@ -213,7 +134,7 @@ const Page = () => {
   }
 
   function add(item: any) {
-    fetch("/api/user", {
+    fetch("/api/note", {
       method: "POST",
       body: JSON.stringify(item),
     }).then((res) => {
@@ -223,7 +144,7 @@ const Page = () => {
   }
 
   function update(item: any) {
-    fetch("/api/user", {
+    fetch("/api/note", {
       method: "PUT",
       body: JSON.stringify({ ...item, id: modalData?.id }),
     }).then((res) => {
@@ -247,7 +168,7 @@ const Page = () => {
       pageSize: tableParams?.pagination?.pageSize,
       params: JSON.stringify(tableParams?.params ?? {}),
     }
-    fetch("/api/user?" + new URLSearchParams(params as any).toString(), {
+    fetch("/api/note?" + new URLSearchParams(params as any).toString(), {
       method: "GET",
       headers: {
         "Content-Type": "application/json",
@@ -329,13 +250,13 @@ const Page = () => {
           <Form form={form}>
             <Row gutter={24}>
               <Col span={6}>
-                <Form.Item label="用户名" name="name">
-                  <Input placeholder="请输入用户名" allowClear />
+                <Form.Item label="笔记名" name="title">
+                  <Input placeholder="请输入笔记名" allowClear />
                 </Form.Item>
               </Col>
               <Col span={6}>
-                <Form.Item label="邮箱" name="email">
-                  <Input placeholder="请输入邮箱" allowClear />
+                <Form.Item label="内容" name="content">
+                  <Input placeholder="请输入内容" allowClear />
                 </Form.Item>
               </Col>
               <Col span={6}>
@@ -363,7 +284,7 @@ const Page = () => {
             }}
           >
             <PlusOutlined />
-            新增用户
+            新增笔记
           </Button>
         </div>
         <Table
@@ -378,7 +299,7 @@ const Page = () => {
           onChange={handleTableChange}
         />
       </div>
-      <UserModal
+      <NoteModal
         open={openModal}
         data={modalData}
         onOk={onOk}

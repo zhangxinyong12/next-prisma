@@ -1,53 +1,40 @@
-import { NextRequest, NextResponse } from "next/server"
-
 import prisma from "@/lib/prisma"
 import { buildJsonResponse } from "@/utils"
-
-// 缓存10秒
-export const revalidate = 10
+import { NextRequest, NextResponse } from "next/server"
 
 export async function GET(request: NextRequest, response: NextResponse) {
   try {
-    // 获取url参数
-    //  访问 /home, pathname 的值为 /home
-    const pathname = request.nextUrl.pathname
-    // 访问 /home?name=lee, searchParams 的值为 { 'name': 'lee' }
     const searchParams = request.nextUrl.searchParams
     let params: any = searchParams.get("params") ?? "{}"
     params = params ? JSON.parse(params === "undefined" ? "{}" : params) : {}
-    const where = {
-      name: {
-        contains: params?.name || undefined,
-      },
-      email: {
-        contains: params?.email || undefined,
-      },
+    const wherre = {
+      title: params?.title || undefined,
+      content: params?.content || undefined,
     }
-    // 分页
     const page = searchParams.get("page") || 1
-    const pageSize = searchParams.get("pageSize") || 20
+    const pageSize = searchParams.get("pageSize") || 10
     const [data, totalCount] = await Promise.all([
-      prisma.user.findMany({
-        skip: (Number(page) - 1) * Number(pageSize),
-        take: Number(pageSize),
-        // 时间倒叙
+      prisma.note.findMany({
+        skip: Number(+page - 1) * Number(pageSize),
+        take: +pageSize,
         orderBy: {
           updatedAt: "desc",
         },
-        // 查询条件
-        where,
-        // 包括用户的笔记数量
+        where: wherre,
         include: {
-          _count: {
+          // author: true, // 在这里指定要包括作者的全部信息
+          author: {
+            // 在这里指定要包括作者的部分信息
             select: {
-              notes: true,
+              id: true,
+              name: true,
+              email: true,
             },
           },
         },
-        // 选择需要的字段,并包含笔记数量
       }),
-      prisma.user.count({
-        where,
+      prisma.note.count({
+        where: wherre,
       }),
     ])
     return NextResponse.json(
@@ -59,17 +46,28 @@ export async function GET(request: NextRequest, response: NextResponse) {
       })
     )
   } catch (error) {
+    console.log(error)
     return NextResponse.json(buildJsonResponse([], false, error as any))
   }
 }
 
-// post 新增
 export async function POST(request: NextRequest, response: NextResponse) {
   const body = await request.json()
+  console.log(body)
+  // 先判断authorId 在不在
+  const userData = await prisma.user.findUnique({
+    where: {
+      id: +body.authorId,
+    },
+  })
+  if (!userData) {
+    return NextResponse.json(buildJsonResponse([], false, "用户不存在"))
+  }
   try {
-    const data = await prisma.user.create({
+    const data = await prisma.note.create({
       data: {
         ...body,
+        authorId: +body.authorId,
       },
     })
     return NextResponse.json(buildJsonResponse(data))
@@ -81,7 +79,7 @@ export async function POST(request: NextRequest, response: NextResponse) {
 export async function DELETE(request: NextRequest, response: NextResponse) {
   const id = request.nextUrl.searchParams.get("id")
   try {
-    const data = await prisma.user.delete({
+    const data = await prisma.note.delete({
       where: {
         id: Number(id),
       },
@@ -99,7 +97,7 @@ export async function PUT(request: NextRequest, response: NextResponse) {
     return NextResponse.json(buildJsonResponse([], false, "id is required"))
   }
   try {
-    await prisma.user.update({
+    await prisma.note.update({
       where: {
         id: parseInt(id),
       },
