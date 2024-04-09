@@ -241,7 +241,7 @@ const Page = () => {
     const params = {
       page: tableParams?.pagination?.current,
       pageSize: tableParams?.pagination?.pageSize,
-      params: JSON.stringify(tableParams?.params),
+      params: JSON.stringify(tableParams?.params??{}),
     }
     fetch("/api/user?" + new URLSearchParams(params as any).toString(), {
       method: "GET",
@@ -310,6 +310,7 @@ const Page = () => {
 
   function onSearch() {
     form.validateFields().then((values) => {
+      console.log(values)
       setTableParams(() => ({
         ...tableParams,
         params: values,
@@ -325,12 +326,12 @@ const Page = () => {
             <Row gutter={24}>
               <Col span={6}>
                 <Form.Item label="用户名" name="name">
-                  <Input placeholder="请输入用户名" />
+                  <Input placeholder="请输入用户名" allowClear />
                 </Form.Item>
               </Col>
               <Col span={6}>
                 <Form.Item label="邮箱" name="email">
-                  <Input placeholder="请输入邮箱" />
+                  <Input placeholder="请输入邮箱"  allowClear />
                 </Form.Item>
               </Col>
               <Col span={6}>
