@@ -9,22 +9,30 @@ datasource db {
 
 // 用户
 model User {
-  id        Int      @id @default(autoincrement())
-  name      String
-  email     String   @unique
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  desc      String?  @db.VarChar(255)
-  notes     Note[]
-}
-
-// 笔记
-model Note {
-  id        Int      @id @default(autoincrement())
-  title     String   @db.VarChar(200)
-  content   String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
+  id        Int       @id @default(autoincrement())
+  // 真实名
+  name      String    @unique
+  // 昵称
+  nickname  String    @unique
+  // 邮箱
+  email     String
+  // 年龄
+  age       Int
+  // 性别 1:男 2：女 -1：保密
+  sex       Int       @default(3)
+  // 角色 1：普通用户 2：管理员 3：超级管理员
+  role      Int       @default(1)
+  // 头像
+  avatar    String?
+  // 密码
+  password  String
+  // 状态 1：正常 0：禁用
+  status    Int       @default(1)
+  // 删除时间
+  deletedAt DateTime?
+  // 删除标记
+  deleted   Boolean   @default(false)
+  // 创建时间
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
