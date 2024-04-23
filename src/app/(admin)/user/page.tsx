@@ -32,7 +32,7 @@ const Page = () => {
     {
       title: "年龄",
       dataIndex: "age",
-      sort: true,
+      sorter: true,
     },
     {
       title: "是否有效",
@@ -56,14 +56,28 @@ const Page = () => {
     {
       title: "创建日期",
       dataIndex: "createdAt",
-      valueType: "dateTimeRange",
+      valueType:'dateTimeRange',
+     hideInTable:true
+    },
+    {
+      title: "创建日期",
+      dataIndex: "createdAt",
+      hideInSearch: true,
       align: "center",
+      renderText(text, record, index, action) {
+        console.log(text,dayjs(text).format("YYYY-MM-DD HH:mm:ss"))
+        return dayjs(text).format("YYYY-MM-DD HH:mm:ss")
+      },
     },
   ]
-  async function onQuery(params = {}, sort, filter) {
+  async function onQuery(params = {}, sort={}, filter={}) {
     return Fetch("/api/user", {
       method: "POST",
-      body: JSON.stringify(params),
+      body: JSON.stringify({
+        ...params,
+        sort,
+        filter
+      }),
     })
       .then(({ data }) => {
         console.log(data)
