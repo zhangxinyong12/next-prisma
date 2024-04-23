@@ -65,7 +65,6 @@ const Page = () => {
       hideInSearch: true,
       align: "center",
       renderText(text, record, index, action) {
-        console.log(text, dayjs(text).format("YYYY-MM-DD HH:mm:ss"))
         return dayjs(text).format("YYYY-MM-DD HH:mm:ss")
       },
     },
