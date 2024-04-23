@@ -15,7 +15,7 @@ model User {
   // 昵称
   nickname  String    @unique
   // 邮箱
-  email     String
+  email     String    @unique
   // 年龄
   age       Int
   // 性别 1:男 2：女 -1：保密

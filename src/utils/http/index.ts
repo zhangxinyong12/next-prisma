@@ -41,7 +41,7 @@ export async function Fetch(
         throw new Error("Unauthorized")
       }
       if (!res.success) {
-        const msg = res.error || "请求失败"
+        const msg = res.message || "请求失败"
         !notShowError && message.error(msg)
         return Promise.reject(res)
       }

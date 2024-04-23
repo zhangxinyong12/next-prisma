@@ -42,3 +42,18 @@ export const formatNumber = (num: number) => {
     return num
   }
 }
+
+/**
+ * 遍历对象，删除所有空字符串和undefined的属性并返回新的对象
+ * @param values { [key: string]: any }
+ * @returns { [key: string]: any }
+ */
+export function removeEmptyAndUndefined(values: { [key: string]: any }) {
+  const filteredValues: { [key: string]: any } = {}
+  for (const key in values) {
+    if (values[key] !== "" && values[key] !== undefined) {
+      filteredValues[key] = values[key]
+    }
+  }
+  return filteredValues
+}

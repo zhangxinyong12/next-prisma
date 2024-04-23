@@ -25,10 +25,12 @@ export async function POST(request: NextRequest) {
       password: encrypt(body.password),
     },
   })
+  console.log(userData,body,user)
   if (!userData) {
     return buildErrorJsonResponse("用户名和密码不匹配")
   }
   const token = jwt.sign(userData, secret!, { expiresIn: "30d" })
+
   return buildSuccessJsonResponse({
     user: userData,
     token,
