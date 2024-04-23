@@ -23,7 +23,7 @@ export default function RootLayout({
       <body className={inter.className}>
         <AntdRegistry>
           <div className="">
-            <div className="header h-[60px] bg-gray-300">hello</div>
+            {/* <div className="header h-[60px] bg-gray-300">hello</div> */}
             <div className="content flex">
               <div
                 className="lef"

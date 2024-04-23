@@ -35,4 +35,55 @@ model User {
   // 创建时间
   createdAt DateTime  @default(now())
   updatedAt DateTime  @updatedAt
+  Book      Book[]
+}
+
+// 书籍模型
+model Book {
+  id         Int        @id @default(autoincrement()) // 唯一标识ID
+  name       String // 书名
+  category   Category[] // 书籍所属的类别
+  desc       String // 书籍描述
+  status     Int        @default(1) // 状态（1：正常,可以借阅；0：禁用；2：已借阅）
+  authorId   Int // 作者ID，外键
+  author     Author     @relation(fields: [authorId], references: [id]) // 与作者表的关联关系  关联关系id定义再1的这边
+  createdAt  DateTime   @default(now()) // 创建时间
+  updatedAt  DateTime   @updatedAt // 更新时间
+  borrowerId Int? // borrowerId以明确表示这是外键
+  borrower   User?      @relation(fields: [borrowerId], references: [id]) // 表示借阅这本书的用户，实现多对一关系
+  borrowerAt DateTime? // 借阅时间，使其可选，因为一本书可能没有被借阅
+
+  // 表名映射
+  @@map("books")
+}
+
+// 类别模型
+model Category {
+  id        Int      @id @default(autoincrement()) // 唯一标识ID
+  name      String // 类别名称
+  books     Book[] // 与书籍表的关联关系，表示该类别下有哪些书籍 @relation(references: [id]) 多对多关系中不用指定，prisma会自动处理
+  // 状态（1：正常；0：禁用）
+  status    Int      @default(1)
+  // 创建时间
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt // 更新时间
+
+  // 表名映射
+  @@map("categories")
+}
+
+// 作者模型
+model Author {
+  id        Int       @id @default(autoincrement()) // 唯一标识ID
+  name      String // 作者名
+  desc      String // 作者描述
+  // 状态（1：正常；0：禁用）
+  status    Int       @default(1)
+  // 删除时间（用于软删除）
+  deletedAt DateTime?
+  deleted   Boolean   @default(false) // 删除标记（false表示未删除，true表示已删除）
+  createdAt DateTime  @default(now()) // 创建时间
+  books     Book[] // 与书籍表的关联关系，表示该作者写了哪些书
+
+  @@map("authors")
 }

@@ -10,8 +10,12 @@ const MenuList: MenuProps["items"] = [
     key: "/user",
   },
   {
-    label: "笔记",
-    key: "/note",
+    label: "书籍",
+    key: "/books",
+  },
+  {
+    label: "类别",
+    key: "/categories",
   },
 ]
 

@@ -1,6 +1,6 @@
 "use client"
 
-import MenuList from "@/data/mune"
+import MenuList from "@/app/(admin)/data/mune"
 import { Menu, MenuProps } from "antd"
 import { usePathname, useRouter } from "next/navigation"
 
