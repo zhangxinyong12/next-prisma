@@ -38,29 +38,34 @@ export async function POST(request: NextRequest) {
 
 // 修改
 export async function PUT(request: NextRequest) {
-  if (!verify(request)) {
-    return buildError401JsonResponse()
+  try {
+    if (!verify(request)) {
+      return buildError401JsonResponse()
+    }
+    const body = await request.json()
+    const id = body.id + ""
+    // 先判断id是否存在
+    const isData = await prisma.category.findUnique({
+      where: {
+        id,
+      },
+    })
+    if (!isData) {
+      return buildErrorJsonResponse(`id:${id}不存在`)
+    }
+    const data = await prisma.category.update({
+      where: {
+        id,
+      },
+      data: {
+        status: +body.status,
+      },
+    })
+    return buildSuccessJsonResponse(data)
+  } catch (error: any) {
+    // error
+    return buildErrorJsonResponse(error?.message as any)
   }
-  const body = await request.json()
-  const id = +body.id
-  // 先判断id是否存在
-  const isData = await prisma.category.findUnique({
-    where: {
-      id,
-    },
-  })
-  if (!isData) {
-    return buildErrorJsonResponse(`id:${id}不存在`)
-  }
-  const data = await prisma.category.update({
-    where: {
-      id,
-    },
-    data: {
-      status: +body.status,
-    },
-  })
-  return buildSuccessJsonResponse(data)
 }
 
 // 删除
