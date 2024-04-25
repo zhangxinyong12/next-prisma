@@ -10,6 +10,7 @@ import {
   PageContainer,
   ProFormRadio,
   ModalForm,
+  ProFormSwitch,
 } from "@ant-design/pro-components"
 import { Button, Form, Popconfirm, Switch, message } from "antd"
 
@@ -53,6 +54,8 @@ const Page = () => {
         return (
           <Switch
             checked={text === 1}
+            checkedChildren="有效"
+            unCheckedChildren="无效"
             onChange={() => {
               changeStatusHandle({
                 id: record.id,
@@ -201,25 +204,12 @@ const Page = () => {
           },
         ]}
       />
-      <ProFormRadio.Group
+      {/* 状态switch */}
+      <ProFormSwitch
         name="status"
         label="是否有效"
-        options={[
-          {
-            label: "有效",
-            value: 1,
-          },
-          {
-            label: "无效",
-            value: 0,
-          },
-        ]}
-        rules={[
-          {
-            required: true,
-            message: "请选择是否有效",
-          },
-        ]}
+        checkedChildren="有效"
+        unCheckedChildren="无效"
       />
     </ModalForm>
   )
