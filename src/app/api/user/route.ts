@@ -1,16 +1,19 @@
 import prisma from "@/lib/prisma"
-import {
-  buildErrorJsonResponse,
-  buildSuccessJsonResponse,
-  removeEmptyAndUndefined,
-} from "@/utils"
+import { removeEmptyAndUndefined } from "@/utils"
 import { encrypt } from "@/utils/crypto"
 import { NextRequest } from "next/server"
-
-import jwt from "jsonwebtoken"
-const secret = process.env.TOKEN_SECRET
+import verify from "@/services/verifyToken"
+import {
+  buildError401JsonResponse,
+  buildSuccessJsonResponse,
+} from "@/utils/buildResponse"
 
 export async function POST(request: NextRequest) {
+  const a = verify(request)
+  console.log(a)
+  if (!a) {
+    return buildError401JsonResponse()
+  }
   const body = await request.json()
   console.log(body)
   const { name, nickname, email, age } = removeEmptyAndUndefined(body)

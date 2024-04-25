@@ -1,8 +1,11 @@
 import prisma from "@/lib/prisma"
-import { buildErrorJsonResponse, buildSuccessJsonResponse } from "@/utils"
 import { encrypt } from "@/utils/crypto"
 import { NextRequest } from "next/server"
 import jwt from "jsonwebtoken"
+import {
+  buildErrorJsonResponse,
+  buildSuccessJsonResponse,
+} from "@/utils/buildResponse"
 const secret = process.env.TOKEN_SECRET
 export async function POST(request: NextRequest) {
   const body = await request.json()
@@ -25,7 +28,7 @@ export async function POST(request: NextRequest) {
       password: encrypt(body.password),
     },
   })
-  console.log(userData,body,user)
+  console.log(userData, body, user)
   if (!userData) {
     return buildErrorJsonResponse("用户名和密码不匹配")
   }

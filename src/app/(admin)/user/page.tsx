@@ -10,9 +10,12 @@ import {
 import dayjs from "dayjs"
 import { useRef } from "react"
 import { Fetch } from "@/utils/http"
+import useGetUserInfo from "@/hooks/useGetUserInfo"
 
 const Page = () => {
   const actionRef = useRef<ActionType>()
+
+  const { userData } = useGetUserInfo()
 
   // 表格的form
   const tableForm = useRef<ProFormInstance>()

@@ -1,8 +1,10 @@
 import prisma from "@/lib/prisma"
-import { buildErrorJsonResponse, buildSuccessJsonResponse } from "@/utils"
 import { encrypt } from "@/utils/crypto"
 import { NextRequest } from "next/server"
-
+import {
+  buildErrorJsonResponse,
+  buildSuccessJsonResponse,
+} from "@/utils/buildResponse"
 // 注册
 export async function POST(request: NextRequest) {
   const body = await request.json()

@@ -7,7 +7,7 @@ import {
   ProFormText,
 } from "@ant-design/pro-components"
 import Link from "next/link"
-import { Button } from "antd"
+import { Button, message } from "antd"
 import { Fetch } from "@/utils/http"
 import { useRouter } from "next/navigation"
 
@@ -15,20 +15,27 @@ const LoginPage = () => {
   const router = useRouter()
 
   const formRef = useRef<ProFormInstance>()
+  const [loading, setLoading] = useState(false)
 
   const handleSubmit = async (values: any) => {
     // 处理登录逻辑，例如调用API
     console.log(values)
     // 根据你的需求进行调整
+    setLoading(true)
     Fetch("/api/login", {
       method: "POST",
       body: JSON.stringify(values),
-    }).then((res) => {
-      console.log(res)
-      localStorage.setItem("token", res.data.token)
-      localStorage.setItem("user", JSON.stringify(res.data.user))
-      router.push("/user")
     })
+      .then((res) => {
+        console.log(res)
+        localStorage.setItem("token", res.data.token)
+        localStorage.setItem("user", JSON.stringify(res.data.user))
+        message.success("登录成功")
+        router.push("/user")
+      })
+      .finally(() => {
+        setLoading(false)
+      })
   }
 
   return (
@@ -49,8 +56,9 @@ const LoginPage = () => {
                     size="large"
                     className="w-full"
                     onClick={() => props.form?.submit?.()}
+                    loading={loading}
                   >
-                    登录
+                    {loading ? "登录中..." : "登录"}
                   </Button>,
                 ]
               },
