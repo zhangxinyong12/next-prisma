@@ -11,7 +11,7 @@ import {
   ProFormRadio,
   ModalForm,
 } from "@ant-design/pro-components"
-import { Button, Form, message } from "antd"
+import { Button, Form, Popconfirm, Switch, message } from "antd"
 
 import dayjs from "dayjs"
 import { useRef } from "react"
@@ -30,12 +30,18 @@ const Page = () => {
     },
     {
       title: "书籍数量",
-      dataIndex: "nickname",
+      dataIndex: "books",
+      align: "right",
+      hideInSearch: true,
     },
     {
       title: "是否有效",
       dataIndex: "status",
       valueType: "select",
+      valueEnum: {
+        0: { text: "无效" },
+        1: { text: "有效" },
+      },
       hideInTable: true,
     },
     {
@@ -44,19 +50,23 @@ const Page = () => {
       hideInSearch: true,
       align: "center",
       renderText(text, record, index, action) {
-        return text === 1 ? (
-          <span className="text-green-500">有效</span>
-        ) : text === 0 ? (
-          <span className="text-red-500">无效</span>
-        ) : (
-          <span className="text-gary-500">未知</span>
+        return (
+          <Switch
+            checked={text === 1}
+            onChange={() => {
+              changeStatusHandle({
+                id: record.id,
+                status: text === 1 ? 0 : 1,
+              })
+            }}
+          />
         )
       },
     },
     {
       title: "创建日期",
       dataIndex: "createdAt",
-      valueType: "dateTimeRange",
+      valueType: "dateRange",
       hideInTable: true,
     },
     {
@@ -68,9 +78,58 @@ const Page = () => {
         return dayjs(text).format("YYYY-MM-DD HH:mm:ss")
       },
     },
+    {
+      title: "操作",
+      valueType: "option",
+      render: (text, record, _, action) => [
+        <Popconfirm
+          key="delete"
+          title="提示"
+          description="确定要删除吗?"
+          onConfirm={() => {
+            deleteHandle(record.id)
+          }}
+          okText="确定"
+          cancelText="取消"
+        >
+          <Button danger>删除</Button>
+        </Popconfirm>,
+      ],
+    },
   ]
-  async function onQuery(params = {}, sort = {}, filter = {}) {
-    return Fetch("/api/user", {
+
+  // 删除 二次弹窗
+  function deleteHandle(id: string) {
+    Fetch("/api/categories", {
+      method: "DELETE",
+      body: JSON.stringify({ id }),
+    }).then(() => {
+      message.success("删除成功")
+      actionRef.current?.reload()
+    })
+  }
+
+  // 切换状态
+  function changeStatusHandle(item: { id: string; status: number }) {
+    Fetch("/api/categories", {
+      method: "PUT",
+      body: JSON.stringify(item),
+    }).then(() => {
+      message.success("状态修改成功")
+      actionRef.current?.reload()
+    })
+  }
+
+  // 分页查询
+  async function onQuery(_params = {}, sort = {}, filter = {}) {
+    const params: any = { ..._params }
+    // createdAt ['','']
+    if (params.createdAt && params.createdAt.length === 2) {
+      params.startDate = params.createdAt[0]
+      params.endDate = params.createdAt[1]
+      delete params.createdAt
+    }
+    return Fetch("/api/categories/list", {
       method: "POST",
       body: JSON.stringify({
         ...params,
@@ -115,8 +174,19 @@ const Page = () => {
       submitTimeout={2000}
       onFinish={async (values) => {
         console.log(values.name)
-        message.success("提交成功")
-        return true
+        return Fetch("/api/categories", {
+          method: "POST",
+          body: JSON.stringify(values),
+        }).then(() => {
+          message.success("提交成功")
+          actionRef.current?.reload()
+          // 关闭弹窗
+          form.resetFields()
+          return true
+        })
+      }}
+      initialValues={{
+        status: 1,
       }}
     >
       <ProFormText
@@ -124,6 +194,32 @@ const Page = () => {
         name="name"
         label="类别名称"
         placeholder="请输入名称"
+        rules={[
+          {
+            required: true,
+            message: "清输入类名名称",
+          },
+        ]}
+      />
+      <ProFormRadio.Group
+        name="status"
+        label="是否有效"
+        options={[
+          {
+            label: "有效",
+            value: 1,
+          },
+          {
+            label: "无效",
+            value: 0,
+          },
+        ]}
+        rules={[
+          {
+            required: true,
+            message: "请选择是否有效",
+          },
+        ]}
       />
     </ModalForm>
   )

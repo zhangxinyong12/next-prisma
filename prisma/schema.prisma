@@ -60,7 +60,7 @@ model Book {
 // 类别模型
 model Category {
   id        Int      @id @default(autoincrement()) // 唯一标识ID
-  name      String // 类别名称
+  name      String   @unique // 类别名称
   books     Book[] // 与书籍表的关联关系，表示该类别下有哪些书籍 @relation(references: [id]) 多对多关系中不用指定，prisma会自动处理
   // 状态（1：正常；0：禁用）
   status    Int      @default(1)
