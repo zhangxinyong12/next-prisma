@@ -1,3 +1,6 @@
+import logger from "@/services/logger"
+import { NextRequest } from "next/server"
+
 /**
  * 请求成功的 response格式
  * @param data 数据体
@@ -22,8 +25,21 @@ export const buildSuccessJsonResponse = (data: any) => {
 export const buildErrorJsonResponse = (
   message: string,
   data: any = "",
-  status = 500
+  status = 500,
+  request?: NextRequest
 ) => {
+  if (request) {
+    logger.error(`请求失败: ${message}`, {
+      url: request.url,
+      method: request.method,
+      headers: {
+        "user-agent": request.headers.get("user-agent") || "",
+        "content-type": request.headers.get("content-type") || "",
+        token: request.headers.get("token") || "",
+        origin: request.headers.get("origin") || "",
+      },
+    })
+  }
   return Response.json({
     data: data,
     success: false,

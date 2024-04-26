@@ -43,7 +43,7 @@ export async function PUT(request: NextRequest) {
       return buildError401JsonResponse()
     }
     const body = await request.json()
-    const id = body.id + ""
+    const id = body.id
     // 先判断id是否存在
     const isData = await prisma.category.findUnique({
       where: {
@@ -64,7 +64,7 @@ export async function PUT(request: NextRequest) {
     return buildSuccessJsonResponse(data)
   } catch (error: any) {
     // error
-    return buildErrorJsonResponse(error?.message as any)
+    return buildErrorJsonResponse(error?.message as any, "", 500, request)
   }
 }
 
