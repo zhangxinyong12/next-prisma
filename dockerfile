@@ -1,5 +1,5 @@
 # Stage 1: Building the code
-FROM --platform=linux/amd64 docker.io/node:20-alpine AS builder
+FROM node:20-alpine AS builder
 
 # 设置工作目录
 WORKDIR /app
@@ -40,7 +40,7 @@ RUN npx clean-modules -y
 RUN pnpm prune --prod
 
 # Stage 2: Run the application
-FROM --platform=linux/amd64 docker.io/node:20-alpine
+FROM node:20-alpine
 
 # 设置工作目录
 WORKDIR /app
@@ -55,7 +55,7 @@ COPY --from=builder /app/prisma prisma
 
 
 # 暴露端口
-EXPOSE 3055
+EXPOSE 3000
 
 # 运行项目
 CMD ["npm", "start"]

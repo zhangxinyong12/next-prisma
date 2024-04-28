@@ -70,12 +70,11 @@ const LoginPage = () => {
             submitter={{
               render: (props, doms) => {
                 return [
-                  <div>
+                  <div key="submit">
                     {error && (
                       <div className="text-sm text-red-500 mb-4">{error}</div>
                     )}
                     <Button
-                      key="submit"
                       type="primary"
                       size="large"
                       className="w-full"

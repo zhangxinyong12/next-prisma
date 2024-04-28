@@ -6,6 +6,8 @@ import {
   buildErrorJsonResponse,
   buildSuccessJsonResponse,
 } from "@/utils/buildResponse"
+import { log } from "console"
+import logger from "@/services/logger"
 const secret = process.env.TOKEN_SECRET
 export async function POST(request: NextRequest) {
   const body = await request.json()
@@ -33,7 +35,11 @@ export async function POST(request: NextRequest) {
     return buildErrorJsonResponse("用户名和密码不匹配")
   }
   const token = jwt.sign(userData, secret!, { expiresIn: "30d" })
-
+  // 记录一下登录日志
+  logger.info(`用户登录: ${userData.name}`, {
+    name: userData.name,
+    id: userData.id,
+  })
   return buildSuccessJsonResponse({
     user: userData,
     token,
